@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-with open(r'E:\neskill\NexSkill course AI bin\WEEK 6\beautiful soap and selenium files\Smart Home Devices & Systems.html', 'r', encoding='utf-8') as file:
+with open(r'E:\neskill\NexSkill course AI bin\WEEK 6\beautiful soap and selenium files\Amazon.com New Releases_ The best-selling new & future releases on Amazon.html', 'r', encoding='utf-8') as file:
     soup = BeautifulSoup(file, 'html.parser')
 
 products = soup.find_all('a', class_='a-color-base a-link-normal ucw-widget-product-card-image-link a-text-normal')

@@ -1,39 +1,30 @@
+#Python program to scrape website 
+#and save quotes from website
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
-
-with open(r'E:\neskill\NexSkill course AI bin\WEEK 6\beautiful soap and selenium files\Alibaba.com.html', 'r', encoding='utf-8') as file:
+import csv
+ 
+URL = r'E:\neskill\NexSkill course AI bin\WEEK 6\beautiful soap and selenium files\Alibaba.com.html'
+with open(URL, 'r', encoding='utf-8') as file:
     soup = BeautifulSoup(file, 'html.parser')
-
-products = soup.find_all('div', class_='fy26-product-card-wrapper')
-
-product_price = []
-product_name = []
-product_link = []
-
-for product in products:
-    try:
-        title = product.find('h2', class_='searchx-product-e-title')
-        name = title.get_text(strip=True)
-    except:
-        name = ''
-    try:
-        price = product.find('div', class_='searchx-product-price-price-main').get_text(strip=True)
-    except:
-        price = ''
-    try:
-        link = title.find('a')['href']
-    except:
-        link = ''
-    product_price.append(price)
-    product_name.append(name)
-    product_link.append(link)
-
-AlibabaProducts = pd.DataFrame({
-    'Product_Name': product_name,
-    'Product_Price': product_price,
-    'Product_Link': product_link
-})
-AlibabaProducts.to_csv('Alibaba_products_bs4.csv', index=False)
-print('Data Saved')
-print('Products found:', len(products))
+ 
+quotes=[]  # a list to store quotes
+ 
+table = soup.find('div', attrs = {'class':'organic-list'}) 
+ 
+for row in table.find_all('div',
+                         attrs = {'class':'fy26-product-card-wrapper'}):
+    quote = {}
+    quote['theme'] = row.h2.text
+    quote['url'] = row.h2.a['href']
+    quote['img'] = row.img['src']
+    quote['lines'] = row.h2.text
+    quote['author'] = row.find('div', attrs={'class':'searchx-product-price-price-main'}).text
+    quotes.append(quote)
+ 
+filename = r'E:\neskill\NexSkill course AI bin\Alibaba_products_bs4.csv'
+with open(filename, 'w', newline='', encoding='utf-8') as f:
+    w = csv.DictWriter(f,['theme','url','img','lines','author'])
+    w.writeheader()
+    for quote in quotes:
+        w.writerow(quote)

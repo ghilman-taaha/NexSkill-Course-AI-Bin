@@ -27,12 +27,4 @@ with open(filename, 'w', newline='', encoding='utf-8') as f:
     for quote in qouestList:
         w.writerow(quote)
 
-print("Saved", len(qouestList), "products to", filename)
-
-input("Data save ho chuka hai. Website dekh lein, phir yahan Enter dabayein browser band karne ke liye...")
-
-try:
-    driver.close()
-except:
-    
-    pass
+driver.close()
