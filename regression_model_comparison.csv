@@ -1,0 +1,4 @@
+Model,RMSE,R2_Score
+Support Vector Regressor,5970.87,0.7602
+Linear Regression,6234.38,0.7386
+Decision Tree Regressor,6375.97,0.7266
