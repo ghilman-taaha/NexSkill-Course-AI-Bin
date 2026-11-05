@@ -1,0 +1,108 @@
+import pandas as pd
+
+
+# Load the diamonds data
+diamonds_data = pd.read_csv(r'E:\neskill\NexSkill course AI bin\FINAL-ASSESSMENT\10-diamonds.csv', index_col='Unnamed: 0')
+
+# Convert text columns to numbers
+diamonds_data["cut"] = diamonds_data["cut"].map({"Fair": 0, "Good": 1, "Very Good": 2, "Premium": 3, "Ideal": 4})
+diamonds_data["color"] = diamonds_data["color"].map({"J": 0, "I": 1, "H": 2, "G": 3, "F": 4, "E": 5, "D": 6})
+diamonds_data["clarity"] = diamonds_data["clarity"].map({"I1": 0, "SI2": 1, "SI1": 2, "VS2": 3, "VS1": 4, "VVS2": 5, "VVS1": 6, "IF": 7})
+diamonds_data["target"] = pd.qcut(diamonds_data["price"], 5, labels=["Low", "Medium", "High", "Premium", "Luxury"])
+
+feature_names = ["carat", "cut", "color", "clarity", "depth", "table", "x", "y", "z"]
+
+diamonds_data_return_X_y = (diamonds_data[feature_names].values, diamonds_data["target"].values)
+print("diamonds_data_return_X_y :    ", diamonds_data_return_X_y)
+print("diamonds_data_return_X_y[0] :    ", diamonds_data_return_X_y[0])
+print("diamonds_data_return_X_y[1] :    ", diamonds_data_return_X_y[1])
+
+print("diamonds_data_as_frame", diamonds_data )
+
+
+# Convert data to pandas dataframe
+diamonds_df = pd.DataFrame(diamonds_data_return_X_y[0], columns=feature_names)
+
+print("diamonds_df - dataFrame: ", diamonds_df)
+
+# Add the target label
+diamonds_df["target"] = diamonds_data_return_X_y[1]
+
+
+# Take a preview
+print("diamonds_df.head() : ", diamonds_df.head())
+
+
+print(" diamonds_df.info() ", diamonds_df.info() )
+
+print(" diamonds_df.describe()  ", diamonds_df.describe()  )
+
+
+print("diamonds_df.tail()" , diamonds_df.tail() )
+
+
+from sklearn.preprocessing import StandardScaler
+
+# Split data into features and label 
+X = diamonds_df[feature_names].copy()
+y = diamonds_df["target"].copy() 
+
+print("X:" , X)
+print("y:" , y)
+
+# Instantiate scaler and fit on features
+scaler = StandardScaler()
+scaler.fit(X)
+
+# Transform features
+X_scaled = scaler.transform(X.values)
+
+# View first instance
+print(X_scaled[0])
+
+
+from sklearn.model_selection import train_test_split
+
+# Split data into train and test
+X_train_scaled, X_test_scaled, y_train, y_test = train_test_split(X_scaled,
+                                                                  y,
+                                                             train_size=.7,
+                                                           random_state=25)
+
+# Check the splits are correct
+print(f"Train size: {round(len(X_train_scaled) / len(X) * 100)}% \n\
+Test size: {round(len(X_test_scaled) / len(X) * 100)}%")
+
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+
+# Instnatiating the models 
+logistic_regression = LogisticRegression()
+svm = SVC()
+tree = DecisionTreeClassifier()
+
+# Training the models 
+logistic_regression.fit(X_train_scaled, y_train)
+svm.fit(X_train_scaled, y_train)
+tree.fit(X_train_scaled, y_train)
+
+# Making predictions with each model
+log_reg_preds = logistic_regression.predict(X_test_scaled)
+svm_preds = svm.predict(X_test_scaled)
+tree_preds = tree.predict(X_test_scaled)
+
+from sklearn.metrics import classification_report
+
+# Store model predictions in a dictionary
+# this makes it's easier to iterate through each model
+# and print the results. 
+model_preds = {
+    "Logistic Regression": log_reg_preds,
+    "Support Vector Machine": svm_preds,
+    "Decision Tree": tree_preds
+}
+
+for model, preds in model_preds.items():
+    print(f"{model} Results:\n{classification_report(y_test, preds)}", sep="\n\n")
